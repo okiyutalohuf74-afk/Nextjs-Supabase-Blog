@@ -13,58 +13,101 @@ interface HomePageProps {
   searchParams: { [key: string]: string | string[] | undefined };
 }
 
-export default async function HomePage({ searchParams }: HomePageProps) {
-  const cookieStore = cookies();
-  const supabase = createClient(cookieStore);
-
-  // Fetch total pages
-  const { count } = await supabase
-    .from("posts")
-    .select("*", { count: "exact", head: true });
-
-  // Pagination
-  const limit = 10;
-  const totalPages = count ? Math.ceil(count / limit) : 0;
-  const page =
-    typeof searchParams.page === "string" &&
-    +searchParams.page > 1 &&
-    +searchParams.page <= totalPages
-      ? +searchParams.page
-      : 1;
-  const from = (page - 1) * limit;
-  const to = page ? from + limit : limit;
-
-  // Fetch posts
-  const { data, error } = await supabase
-    .from("posts")
-    .select(`*, categories(*), profiles(*)`)
-    .eq("published", true)
-    .order("created_at", { ascending: false })
-    .range(from, to)
-    .returns<PostWithCategoryWithProfile[]>();
-
-  if (!data || error || !data.length) {
-    notFound;
+function logHomePageError(phase: string, err: unknown) {
+  if (err instanceof Error) {
+    console.error(`[HomePage] ${phase}`, {
+      name: err.name,
+      message: err.message,
+      stack: err.stack,
+      cause: err.cause,
+    });
+    console.error(`[HomePage] ${phase} (full message string):`, err.message);
+    if (err.stack) {
+      console.error(`[HomePage] ${phase} (stack):`, err.stack);
+    }
+  } else {
+    console.error(`[HomePage] ${phase} (non-Error):`, err);
+    try {
+      if (err !== null && typeof err === "object") {
+        console.error(
+          `[HomePage] ${phase} (JSON):`,
+          JSON.stringify(err, Object.getOwnPropertyNames(err)),
+        );
+      } else {
+        console.error(`[HomePage] ${phase} (value):`, String(err));
+      }
+    } catch {
+      console.error(`[HomePage] ${phase} (String):`, String(err));
+    }
   }
+}
 
-  return (
-    <>
-      <div className="space-y-6">
-        {data?.map((post) => (
-          <Suspense key={v4()} fallback={<MainPostItemLoading />}>
-            <MainPostItem post={post} />
-          </Suspense>
-        ))}
-      </div>
-      {/* Pagination */}
-      {totalPages > 1 && (
-        <SharedPagination
-          page={page}
-          totalPages={totalPages}
-          baseUrl="/"
-          pageUrl="?page="
-        />
-      )}
-    </>
-  );
+export default async function HomePage({ searchParams }: HomePageProps) {
+  try {
+    const cookieStore = cookies();
+    const supabase = createClient(cookieStore);
+
+    // Fetch total pages
+    const { count } = await supabase
+      .from("posts")
+      .select("*", { count: "exact", head: true });
+
+    // Pagination
+    const limit = 10;
+    const totalPages = count ? Math.ceil(count / limit) : 0;
+    const page =
+      typeof searchParams.page === "string" &&
+      +searchParams.page > 1 &&
+      +searchParams.page <= totalPages
+        ? +searchParams.page
+        : 1;
+    const from = (page - 1) * limit;
+    const to = page ? from + limit : limit;
+
+    // Fetch posts
+    const { data, error } = await supabase
+      .from("posts")
+      .select(`*, categories(*), profiles(*)`)
+      .eq("published", true)
+      .order("created_at", { ascending: false })
+      .range(from, to)
+      .returns<PostWithCategoryWithProfile[]>();
+
+    if (error) {
+      console.error("[HomePage] Supabase posts query error:", {
+        message: error.message,
+        details: error.details,
+        hint: error.hint,
+        code: error.code,
+      });
+      notFound();
+    }
+
+    if (!data || !data.length) {
+      notFound();
+    }
+
+    return (
+      <>
+        <div className="space-y-6">
+          {data.map((post) => (
+            <Suspense key={v4()} fallback={<MainPostItemLoading />}>
+              <MainPostItem post={post} />
+            </Suspense>
+          ))}
+        </div>
+        {totalPages > 1 && (
+          <SharedPagination
+            page={page}
+            totalPages={totalPages}
+            baseUrl="/"
+            pageUrl="?page="
+          />
+        )}
+      </>
+    );
+  } catch (err) {
+    logHomePageError("unhandled", err);
+    throw err;
+  }
 }
