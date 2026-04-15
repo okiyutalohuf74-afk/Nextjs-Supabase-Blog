@@ -1,5 +1,6 @@
 import { TailwindIndicator } from "@/components/main";
 import { seoData } from "@/config/root/seo";
+import { logServerError } from "@/lib/log-server-error";
 import { getUrl } from "@/lib/utils";
 import "@/styles/tailwind.css";
 import { Analytics as VercelAnalytics } from "@vercel/analytics/react";
@@ -13,6 +14,10 @@ const fontSans = FontSans({
   display: "swap",
 });
 
+/**
+ * Ошибки при вычислении metadata / export выполняются при загрузке модуля;
+ * их не перехватит try/catch внутри RootLayout — смотрите логи сборки / первый импорт.
+ */
 export const metadata: Metadata = {
   title: {
     template: "%s | [SITE_NAME]",
@@ -41,13 +46,6 @@ export const metadata: Metadata = {
   alternates: {
     canonical: "/",
   },
-  // viewport: {
-  //   width: "device-width",
-  //   initialScale: 1,
-  //   maximumScale: 1,
-  //   userScalable: false,
-  //   viewportFit: "cover",
-  // },
   robots: {
     index: false,
     follow: true,
@@ -96,7 +94,6 @@ export const metadata: Metadata = {
     siteName: seoData.title,
     images: [
       {
-        // url: getOgImageUrl(metaData.title, metaData.subTitle, metaData.tags, '/'),
         url: `${getUrl()}/images/opengraph-image.png`,
         width: 1200,
         height: 630,
@@ -108,7 +105,6 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: seoData.ogTitle,
     description: seoData.description,
-    // images: [getOgImageUrl(metaData.title, metaData.subTitle, metaData.tags, '/')],
     images: `${getUrl()}/images/twitter-image.png`,
     creator: seoData.author.twitterAddress,
   },
@@ -126,16 +122,21 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return (
-    <html lang="en" suppressHydrationWarning>
-      <body className={fontSans.variable}>
-        <div className="bg-white font-sans">
-          {children}
-          <VercelAnalytics />
-          <Toaster position="top-center" />
-          <TailwindIndicator />
-        </div>
-      </body>
-    </html>
-  );
+  try {
+    return (
+      <html lang="en" suppressHydrationWarning>
+        <body className={fontSans.variable}>
+          <div className="bg-white font-sans">
+            {children}
+            <VercelAnalytics />
+            <Toaster position="top-center" />
+            <TailwindIndicator />
+          </div>
+        </body>
+      </html>
+    );
+  } catch (err) {
+    logServerError("RootLayout", "render", err);
+    throw err;
+  }
 }

@@ -1,5 +1,6 @@
 import { MainPostItem, MainPostItemLoading } from "@/components/main";
 import { SharedPagination } from "@/components/shared";
+import { logServerError } from "@/lib/log-server-error";
 import { PostWithCategoryWithProfile } from "@/types/collection";
 import { createClient } from "@/utils/supabase/server";
 import { cookies } from "next/headers";
@@ -11,35 +12,6 @@ export const revalidate = 0;
 
 interface HomePageProps {
   searchParams: { [key: string]: string | string[] | undefined };
-}
-
-function logHomePageError(phase: string, err: unknown) {
-  if (err instanceof Error) {
-    console.error(`[HomePage] ${phase}`, {
-      name: err.name,
-      message: err.message,
-      stack: err.stack,
-      cause: err.cause,
-    });
-    console.error(`[HomePage] ${phase} (full message string):`, err.message);
-    if (err.stack) {
-      console.error(`[HomePage] ${phase} (stack):`, err.stack);
-    }
-  } else {
-    console.error(`[HomePage] ${phase} (non-Error):`, err);
-    try {
-      if (err !== null && typeof err === "object") {
-        console.error(
-          `[HomePage] ${phase} (JSON):`,
-          JSON.stringify(err, Object.getOwnPropertyNames(err)),
-        );
-      } else {
-        console.error(`[HomePage] ${phase} (value):`, String(err));
-      }
-    } catch {
-      console.error(`[HomePage] ${phase} (String):`, String(err));
-    }
-  }
 }
 
 export default async function HomePage({ searchParams }: HomePageProps) {
@@ -107,7 +79,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
       </>
     );
   } catch (err) {
-    logHomePageError("unhandled", err);
+    logServerError("HomePage", "unhandled", err);
     throw err;
   }
 }
