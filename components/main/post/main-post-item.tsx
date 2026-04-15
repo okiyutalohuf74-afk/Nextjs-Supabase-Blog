@@ -68,15 +68,14 @@ const MainPostItem: React.FC<MainPostItemProps> = async ({ post }) => {
           <Link href={`/posts/${post.slug}`}>
             <article className="relative isolate flex max-w-3xl flex-col gap-2 rounded-lg bg-white px-5 py-5 shadow-md shadow-gray-300 ring-1 ring-black/5 sm:gap-8 sm:px-10 sm:py-6 lg:flex-row">
               <div className="relative aspect-[16/9] sm:aspect-[2/1] lg:aspect-square lg:w-64 lg:shrink-0">
-                <Image
+                {/* eslint-disable-next-line @next/next/no-img-element -- обложка с внешних URL без remotePatterns */}
+                <img
                   src={await getPublicImageUrl(post.id, post.image || "")}
                   alt={post.title ?? "Cover"}
-                  height={256}
                   width={256}
-                  priority
-                  placeholder={`data:image/svg+xml;base64,${toBase64(
-                    shimmer(256, 256),
-                  )}`}
+                  height={256}
+                  loading="eager"
+                  decoding="async"
                   className="absolute inset-0 h-full w-full rounded-2xl bg-gray-50 object-cover"
                 />
                 <div className="absolute inset-0 rounded-2xl ring-1 ring-inset ring-gray-900/10" />

@@ -51,15 +51,15 @@ const DetailPostHeading: FC<DetailPostHeadingProps> = async ({
   return (
     <section className="flex flex-col items-start justify-between">
       <div className="relative w-full">
-        <Image
+        {/* eslint-disable-next-line @next/next/no-img-element -- обложка с внешних URL без remotePatterns */}
+        <img
           src={await getPublicImageUrl(id, image)}
           alt={title}
           width={512}
           height={288}
+          loading="eager"
+          decoding="async"
           className="h-[288px] w-full rounded-2xl bg-gray-100 object-cover"
-          placeholder={`data:image/svg+xml;base64,${toBase64(
-            shimmer(512, 288),
-          )}`}
         />
         <div className="absolute inset-0 rounded-2xl ring-1 ring-inset ring-gray-900/10" />
       </div>
