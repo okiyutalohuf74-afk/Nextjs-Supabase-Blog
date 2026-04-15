@@ -17,7 +17,15 @@ async function getPublicImageUrl(
   postId: string | null | undefined,
   fileName: string | null | undefined,
 ) {
-  if (isNullish(postId) || postId === "" || isNullish(fileName) || fileName === "") {
+  if (isNullish(fileName) || fileName === "") {
+    return "/images/not-found.jpg";
+  }
+  const trimmed = fileName.trim();
+  const lower = trimmed.toLowerCase();
+  if (lower.startsWith("http://") || lower.startsWith("https://")) {
+    return trimmed;
+  }
+  if (isNullish(postId) || postId === "") {
     return "/images/not-found.jpg";
   }
   const cookieStore = cookies();
