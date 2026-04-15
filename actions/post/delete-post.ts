@@ -1,5 +1,6 @@
 "use server";
 
+import { isNullish } from "@/lib/supabase-guards";
 import { postDeleteSchema } from "@/lib/validation/post";
 import type { Database } from "@/types/supabase";
 import { createClient } from "@/utils/supabase/server";
@@ -11,6 +12,9 @@ export async function DeletePost(context: z.infer<typeof postDeleteSchema>) {
   const supabase = createClient(cookieStore);
   try {
     const post = postDeleteSchema.parse(context);
+    if (isNullish(post.id) || isNullish(post.user_id)) {
+      return false;
+    }
 
     const { data, error } = await supabase
       .from("drafts")

@@ -1,3 +1,4 @@
+import { isNullish } from "@/lib/supabase-guards";
 import { getMinutes, shimmer, toBase64 } from "@/lib/utils";
 import { createClient } from "@/utils/supabase/server";
 import { ArchiveIcon, CalendarIcon, ClockIcon } from "lucide-react";
@@ -6,7 +7,13 @@ import Image from "next/image";
 import { FC } from "react";
 import { ReadTimeResults } from "reading-time";
 
-async function getPublicImageUrl(postId: string, fileName: string) {
+async function getPublicImageUrl(
+  postId: string | null | undefined,
+  fileName: string | null | undefined,
+) {
+  if (isNullish(postId) || postId === "" || isNullish(fileName) || fileName === "") {
+    return "/images/not-found.jpg";
+  }
   const cookieStore = cookies();
   const supabase = createClient(cookieStore);
   const bucketName =

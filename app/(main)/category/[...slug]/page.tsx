@@ -8,7 +8,7 @@ import type { Database } from "@/types/supabase";
 import { createClient } from "@/utils/supabase/server";
 import { Metadata } from "next";
 import { cookies } from "next/headers";
-import notFound from "next/navigation";
+import { notFound } from "next/navigation";
 import React from "react";
 import { v4 } from "uuid";
 
@@ -77,18 +77,26 @@ export default async function CategoryPage({
   params,
   searchParams,
 }: CategoryPageProps) {
-  const cookieStore = cookies();
-  const supabase = createClient(cookieStore);
-  // Get category by slug
   const slug = params?.slug?.join("/");
   const category = mainCategoryConfig.find(
     (category) => category.slug === slug,
   );
+
+  if (!category) {
+    notFound();
+  }
+
+  const cookieStore = cookies();
+  const supabase = createClient(cookieStore);
+
+  /** В конфиге у «Home» id — пустая строка; это валидно для фильтра. */
+  const categoryId = category.id ?? "";
+
   // Fetch total pages
   const { count } = await supabase
     .from("posts")
     .select("*", { count: "exact", head: true })
-    .eq("category_id", category?.id ? category?.id : "");
+    .eq("category_id", categoryId);
 
   // Pagination
   const limit = 10;
@@ -102,16 +110,10 @@ export default async function CategoryPage({
   const from = (page - 1) * limit;
   const to = page ? from + limit : limit;
 
-  // Fetch posts
-
-  if (!category) {
-    notFound;
-  }
-
   const { data, error } = await supabase
     .from("posts")
     .select(`*, categories(*), profiles(*)`)
-    .match({ category_id: category?.id, published: true })
+    .match({ category_id: categoryId, published: true })
     .order("created_at", { ascending: false })
     .range(from, to)
     .returns<PostWithCategoryWithProfile[]>();

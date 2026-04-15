@@ -1,5 +1,6 @@
 "use server";
 
+import { isNullish } from "@/lib/supabase-guards";
 import { commentDeleteSchema } from "@/lib/validation/comment";
 import { Database } from "@/types/supabase";
 import { createClient } from "@/utils/supabase/server";
@@ -13,6 +14,9 @@ export async function DeleteComment(
   const supabase = createClient(cookieStore);
   try {
     const comment = commentDeleteSchema.parse(context);
+    if (isNullish(comment.id) || isNullish(comment.userId)) {
+      return false;
+    }
 
     const { data, error } = await supabase
       .from("comments")

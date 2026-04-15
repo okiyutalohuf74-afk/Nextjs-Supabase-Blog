@@ -1,6 +1,7 @@
 import Editor from "@/components/protected/editor/editor";
 import { Separator } from "@/components/ui/separator";
 import { protectedEditorConfig } from "@/config/protected";
+import { isNullish } from "@/lib/supabase-guards";
 import { Draft } from "@/types/collection";
 import { createClient } from "@/utils/supabase/server";
 import { cookies } from "next/headers";
@@ -29,7 +30,10 @@ async function getUserId() {
   return session ? session.user.id : null;
 }
 
-async function getPost(postId: string, userId: string) {
+async function getPost(postId: string, userId: string | null) {
+  if (isNullish(postId) || isNullish(userId) || userId === "") {
+    return null;
+  }
   const cookieStore = cookies();
   const supabase = createClient(cookieStore);
   const { data, error } = await supabase
@@ -53,6 +57,9 @@ async function getCoverImageFileName(
   userId: string,
   postId: string,
 ) {
+  if (isNullish(postId) || isNullish(userId) || userId === "") {
+    return null;
+  }
   const cookieStore = cookies();
   const supabase = createClient(cookieStore);
   const { data, error } = await supabase.storage
@@ -81,6 +88,15 @@ async function getCoverImageUrl(
   postId: string,
   fileName: string,
 ) {
+  if (
+    isNullish(postId) ||
+    isNullish(userId) ||
+    userId === "" ||
+    isNullish(fileName) ||
+    fileName === ""
+  ) {
+    return "";
+  }
   const cookieStore = cookies();
   const supabase = createClient(cookieStore);
   const { data } = supabase.storage
@@ -91,7 +107,14 @@ async function getCoverImageUrl(
 }
 
 // Get Gallery images filenames and public urls
-async function getGalleryImageFileNames(bucketName: string, userId, postId) {
+async function getGalleryImageFileNames(
+  bucketName: string,
+  userId: string,
+  postId: string,
+) {
+  if (isNullish(postId) || isNullish(userId) || userId === "") {
+    return null;
+  }
   const cookieStore = cookies();
   const supabase = createClient(cookieStore);
   const { data, error } = await supabase.storage
@@ -121,37 +144,53 @@ async function getGalleryImageUrls(
   postId: string,
   fileNames: string[],
 ) {
+  if (
+    isNullish(postId) ||
+    isNullish(userId) ||
+    userId === "" ||
+    !fileNames?.length
+  ) {
+    return [];
+  }
   const cookieStore = cookies();
   const supabase = createClient(cookieStore);
   let filePublicUrls: string[] = [];
-  fileNames.map((fileName) => {
+  fileNames.forEach((fileName) => {
+    if (isNullish(fileName) || fileName === "") {
+      return;
+    }
     const { data } = supabase.storage
       .from(bucketName)
       .getPublicUrl(`${userId}/${postId}/${fileName}`);
 
-    data && filePublicUrls.push(data.publicUrl);
+    if (data?.publicUrl) {
+      filePublicUrls.push(data.publicUrl);
+    }
   });
 
   return filePublicUrls;
 }
 
 export default async function PostEditorPage({ params }: PostEditorPageProps) {
+  if (isNullish(params.postId) || params.postId === "") {
+    notFound();
+  }
   const bucketNameCoverImage =
     process.env.NEXT_PUBLIC_SUPABASE_STORAGE_BUCKET_COVER_IMAGE!;
   const bucketNameGalleryImage =
     process.env.NEXT_PUBLIC_SUPABASE_STORAGE_BUCKET_GALLERY_IMAGE!;
   const userId = await getUserId();
-  const post = await getPost(params.postId, userId || "");
+  const post = await getPost(params.postId, userId);
 
   // Cover image setup
   const coverImageFileName = await getCoverImageFileName(
     bucketNameCoverImage,
-    userId || "",
+    userId ?? "",
     params.postId,
   );
   const coverImagePublicUrl = await getCoverImageUrl(
     bucketNameCoverImage,
-    userId || "",
+    userId ?? "",
     params.postId,
     coverImageFileName || "",
   );
@@ -159,18 +198,18 @@ export default async function PostEditorPage({ params }: PostEditorPageProps) {
   // Gallery images setup
   const galleryImageFileNames = await getGalleryImageFileNames(
     bucketNameGalleryImage,
-    userId,
+    userId ?? "",
     params.postId,
   );
   const galleryImagePublicUrls = await getGalleryImageUrls(
     bucketNameGalleryImage,
-    userId || "",
+    userId ?? "",
     params.postId,
     galleryImageFileNames || [],
   );
 
   if (!post) {
-    return notFound;
+    notFound();
   }
 
   return (

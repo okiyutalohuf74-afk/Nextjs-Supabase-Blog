@@ -11,7 +11,7 @@ async function getPost(params: { slug: string[] }) {
   const slug = params?.slug?.join("/");
 
   if (!slug) {
-    notFound;
+    notFound();
   }
 
   const response = await supabase
@@ -21,7 +21,7 @@ async function getPost(params: { slug: string[] }) {
     .single<PostWithCategoryWithProfile>();
 
   if (!response.data) {
-    notFound;
+    notFound();
   }
 
   return response.data;

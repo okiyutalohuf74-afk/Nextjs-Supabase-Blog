@@ -1,5 +1,6 @@
 "use server";
 
+import { isNullish } from "@/lib/supabase-guards";
 import { imageDeleteSchema } from "@/lib/validation/image";
 import { Database } from "@/types/supabase";
 import { createClient } from "@/utils/supabase/server";
@@ -13,6 +14,9 @@ export async function DeleteGalleryImage(
   const supabase = createClient(cookieStore);
   try {
     const { userId, postId, fileName } = imageDeleteSchema.parse(context);
+    if (isNullish(userId) || isNullish(postId) || isNullish(fileName)) {
+      return false;
+    }
     const bucketName =
       process.env.NEXT_PUBLIC_SUPABASE_STORAGE_BUCKET_GALLERY_IMAGE ||
       "gallery-image";

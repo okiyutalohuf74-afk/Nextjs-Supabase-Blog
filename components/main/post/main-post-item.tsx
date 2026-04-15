@@ -1,4 +1,5 @@
 import { mainPostConfig } from "@/config/main";
+import { isNullish } from "@/lib/supabase-guards";
 import { getMinutes, shimmer, toBase64 } from "@/lib/utils";
 import { Comment, PostWithCategoryWithProfile } from "@/types/collection";
 import { createClient } from "@/utils/supabase/server";
@@ -16,7 +17,7 @@ async function getPublicImageUrl(
   postId: string | null | undefined,
   fileName: string | null | undefined,
 ) {
-  if (!postId || !fileName) {
+  if (isNullish(postId) || postId === "" || isNullish(fileName) || fileName === "") {
     return "/images/not-found.jpg";
   }
   const cookieStore = cookies();
@@ -33,7 +34,7 @@ async function getPublicImageUrl(
 }
 
 async function getComments(postId: string | null | undefined) {
-  if (!postId) {
+  if (isNullish(postId) || postId === "") {
     return [];
   }
   const cookieStore = cookies();

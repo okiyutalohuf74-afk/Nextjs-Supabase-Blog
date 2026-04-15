@@ -1,5 +1,6 @@
 "use server";
 
+import { isNullish } from "@/lib/supabase-guards";
 import { bookmarkSchema } from "@/lib/validation/bookmark";
 import { Database } from "@/types/supabase";
 import { createClient } from "@/utils/supabase/server";
@@ -12,6 +13,9 @@ export async function DeleteBookmark(context: z.infer<typeof bookmarkSchema>) {
 
   try {
     const bookmark = bookmarkSchema.parse(context);
+    if (isNullish(bookmark.id) || isNullish(bookmark.user_id)) {
+      return false;
+    }
 
     const { data, error } = await supabase
       .from("bookmarks")

@@ -1,5 +1,6 @@
 "use server";
 
+import { isNullish } from "@/lib/supabase-guards";
 import { profileSchema } from "@/lib/validation/profile";
 import { Database } from "@/types/supabase";
 import { createClient } from "@/utils/supabase/server";
@@ -11,6 +12,9 @@ export async function UpdateSettings(context: z.infer<typeof profileSchema>) {
   const supabase = createClient(cookieStore);
   try {
     const profile = profileSchema.parse(context);
+    if (isNullish(profile.id)) {
+      return false;
+    }
     const { data, error } = await supabase
       .from("profiles")
       .update({

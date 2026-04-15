@@ -1,4 +1,5 @@
 import ProtectedSettingsProfile from "@/components/protected/settings/protected-settings-profile";
+import { isNullish } from "@/lib/supabase-guards";
 import { Profile } from "@/types/collection";
 import { createClient } from "@/utils/supabase/server";
 import { cookies } from "next/headers";
@@ -28,6 +29,10 @@ const SettingsPage = async () => {
   const supabase = createClient(cookieStore);
 
   const userId = await getUserId();
+
+  if (isNullish(userId)) {
+    notFound();
+  }
 
   const { data, error } = await supabase
     .from("profiles")

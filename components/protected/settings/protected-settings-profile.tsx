@@ -27,6 +27,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { protectedProfileConfig } from "@/config/protected";
+import { isNullish } from "@/lib/supabase-guards";
 import { shimmer, toBase64 } from "@/lib/utils";
 import { profileFormSchema } from "@/lib/validation/profile";
 import { Profile } from "@/types/collection";
@@ -56,6 +57,14 @@ async function downloadImage(
   userId: string,
   fileName: string,
 ) {
+  if (
+    isNullish(userId) ||
+    userId === "" ||
+    isNullish(fileName) ||
+    fileName === ""
+  ) {
+    return null;
+  }
   const supabase = createClient();
   const { data } = supabase.storage
     .from(bucketName)

@@ -6,6 +6,7 @@ import {
 } from "@/components/detail/post";
 import { DetailPostScrollUpButton } from "@/components/detail/post/buttons";
 import { seoData } from "@/config/root/seo";
+import { isNullish } from "@/lib/supabase-guards";
 import { getOgImageUrl, getUrl } from "@/lib/utils";
 import {
   CommentWithProfile,
@@ -41,6 +42,9 @@ async function getBookmark(postId: string, userId: string) {
 
 async function getPost(params: { slug: string[] }) {
   const slug = params?.slug?.join("/");
+  if (!slug) {
+    notFound();
+  }
   const cookieStore = cookies();
   const supabase = createClient(cookieStore);
 
@@ -51,7 +55,7 @@ async function getPost(params: { slug: string[] }) {
     .single<PostWithCategoryWithProfile>();
 
   if (!response.data) {
-    notFound;
+    notFound();
   }
 
   return response.data;
@@ -111,7 +115,10 @@ export async function generateMetadata({
   };
 }
 
-async function getComments(postId: string) {
+async function getComments(postId: string | null | undefined) {
+  if (isNullish(postId) || postId === "") {
+    return [];
+  }
   const cookieStore = cookies();
   const supabase = createClient(cookieStore);
   const { data: comments, error } = await supabase

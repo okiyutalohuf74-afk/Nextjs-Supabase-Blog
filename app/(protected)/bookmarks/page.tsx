@@ -6,6 +6,7 @@ import { DataTable } from "@/components/protected/post/table/data-table";
 import { SharedTableEmpty } from "@/components/shared";
 import { detailBookMarkConfig } from "@/config/detail";
 import { sharedEmptyConfig } from "@/config/shared";
+import { isNullish } from "@/lib/supabase-guards";
 import { BookMarkWithPost, Post } from "@/types/collection";
 import { createClient } from "@/utils/supabase/server";
 import { Metadata } from "next";
@@ -50,12 +51,26 @@ const BookmarksPage: React.FC<BookmarksPageProps> = async ({
   const from = (page - 1) * limit;
   const to = page ? from + limit : limit;
 
+  const uid = user?.id;
+  if (isNullish(uid)) {
+    return (
+      <>
+        <div className="mx-auto max-w-5xl p-4 sm:p-6 lg:p-8">
+          <SharedTableEmpty
+            emptyTitle={sharedEmptyConfig.title}
+            emptyDescription={sharedEmptyConfig.description}
+          />
+        </div>
+      </>
+    );
+  }
+
   // Fetch posts
   const { data, error } = await supabase
     .from("bookmarks")
     .select(`*, posts(*)`)
     .order("created_at", { ascending: false })
-    .match({ user_id: user?.id })
+    .match({ user_id: uid })
     .range(from, to)
     .returns<BookMarkWithPost[]>();
 

@@ -4,6 +4,7 @@ import PostTableTitle from "@/components/protected/post/post-table-title";
 import { columns } from "@/components/protected/post/table/columns";
 import { DataTable } from "@/components/protected/post/table/data-table";
 import { protectedPostConfig } from "@/config/protected";
+import { isNullish } from "@/lib/supabase-guards";
 import { Draft } from "@/types/collection";
 import type { Database } from "@/types/supabase";
 import { createClient } from "@/utils/supabase/server";
@@ -31,12 +32,24 @@ const PostsPage: FC<PostsPageProps> = async ({ searchParams }) => {
     data: { user },
   } = await supabase.auth.getUser();
 
+  const authorId = user?.id;
+  if (isNullish(authorId)) {
+    return (
+      <>
+        <div className="mx-auto max-w-5xl p-4 sm:p-6 lg:p-8">
+          <PostTableEmpty />
+          <PostRefreshOnce />
+        </div>
+      </>
+    );
+  }
+
   // Fetch posts
   const { data, error } = await supabase
     .from("drafts")
     .select(`*, categories(*)`)
     .order("created_at", { ascending: false })
-    .match({ author_id: user?.id })
+    .match({ author_id: authorId })
     .returns<Draft[]>();
 
   if (!data || error || !data.length) {

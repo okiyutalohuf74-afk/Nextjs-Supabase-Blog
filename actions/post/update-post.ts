@@ -1,5 +1,6 @@
 "use server";
 
+import { isNullish } from "@/lib/supabase-guards";
 import { postUpdateSchema } from "@/lib/validation/post";
 import type { Database } from "@/types/supabase";
 import { createClient } from "@/utils/supabase/server";
@@ -11,6 +12,9 @@ export async function UpdatePost(context: z.infer<typeof postUpdateSchema>) {
   const supabase = createClient(cookieStore);
   try {
     const post = postUpdateSchema.parse(context);
+    if (isNullish(post.id)) {
+      return null;
+    }
 
     const { data, error } = await supabase
       .from("drafts")
