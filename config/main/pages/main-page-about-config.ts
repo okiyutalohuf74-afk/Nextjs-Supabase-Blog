@@ -9,7 +9,7 @@ import {
 const mainPageAboutConfig: AboutPageType = {
   general: {
     title: "[PLACEHOLDER]",
-    subTitle: "[SITE_NAME]",
+    subTitle: "Royal Reels Direct",
     description: "[PLACEHOLDER]",
     paragraphs: [
       {

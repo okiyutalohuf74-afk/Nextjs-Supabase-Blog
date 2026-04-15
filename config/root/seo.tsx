@@ -1,10 +1,10 @@
 import { SeoType } from "types";
 
 export const seoData: SeoType = {
-  title: "[SITE_NAME]",
-  subTitle: "[SITE_NAME]",
-  absoluteTitle: "Next.js | [SITE_NAME]",
-  ogTitle: "Next.js | Supabase | [SITE_NAME]",
+  title: "Royal Reels Direct",
+  subTitle: "Royal Reels Direct",
+  absoluteTitle: "Royal Reels Direct",
+  ogTitle: "Royal Reels Direct",
   author: {
     name: "Tim",
     twitterUrl: "https://twitter.com/timtbdev",

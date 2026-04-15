@@ -1,3 +1,4 @@
+export { default as MainBrandLogo } from "./header/main-brand-logo";
 export { default as MainHeader } from "./header/main-header";
 export { default as MainGrid } from "./grid/main-grid";
 export { default as MainFooter } from "./footer/main-footer";

@@ -56,7 +56,7 @@ const mainFooterConfig: FooterType = {
       slug: "/policy",
     },
   ],
-  copyright: "© 2026 [SITE_NAME]. All rights reserved.",
+  copyright: "© 2026 Royal Reels Direct. All rights reserved.",
 };
 
 export default mainFooterConfig;
