@@ -65,7 +65,9 @@ const MainFooter = () => {
                     <li key={v4()}>
                       <Link
                         href={social.url}
-                        target="_blank"
+                        {...(social.url.startsWith("http")
+                          ? { target: "_blank", rel: "noopener noreferrer" }
+                          : {})}
                         className="text-sm leading-6 text-gray-600 hover:text-gray-900 hover:underline"
                       >
                         {social.name}
@@ -101,6 +103,9 @@ const MainFooter = () => {
               <a
                 key={item.name}
                 href={item.url}
+                {...(item.url.startsWith("http")
+                  ? { target: "_blank", rel: "noopener noreferrer" }
+                  : {})}
                 className="text-gray-400 hover:text-gray-500"
               >
                 <span className="sr-only">{item.name}</span>

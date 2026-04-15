@@ -1,7 +1,16 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
 import { sharedLoginConfig } from "@/config/shared";
-import { GithubIcon, GoogleIcon, LoadingDots } from "@/icons";
 import { getUrl } from "@/lib/utils";
 import { createClient } from "@/utils/supabase/client";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -9,13 +18,14 @@ import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import React from "react";
 import { useForm } from "react-hook-form";
+import toast from "react-hot-toast";
 import z from "zod";
 
 const getLoginRedirectPath = (pathname?: string | null): string => {
   return (
     getUrl() +
-    "/auth/callback" + // Required for PKCE authentication.
-    "?redirect=" + // Passed to auth/route/callback to redirect after auth
+    "/auth/callback" +
+    "?redirect=" +
     (pathname ? pathname : "/dashboard")
   );
 };
@@ -26,6 +36,11 @@ const FormSchema = z.object({
       required_error: sharedLoginConfig.emailRequiredError,
     })
     .email(),
+  password: z
+    .string({
+      required_error: sharedLoginConfig.passwordRequiredError,
+    })
+    .min(6, sharedLoginConfig.passwordMinError),
 });
 
 interface LoginSectionProps {
@@ -34,43 +49,52 @@ interface LoginSectionProps {
 
 const LoginSection: React.FC<LoginSectionProps> = ({ setOpen }) => {
   const supabase = createClient();
-  const form = useForm<z.infer<typeof FormSchema>>({
-    resolver: zodResolver(FormSchema),
-  });
-  const [signInGoogleClicked, setSignInGoogleClicked] =
-    React.useState<boolean>(false);
-  const [signInGithubClicked, setSignInGithubClicked] =
-    React.useState<boolean>(false);
+  const [isSignUp, setIsSignUp] = React.useState(false);
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
   const router = useRouter();
   const currentPathname = usePathname();
   const redirectTo = getLoginRedirectPath(currentPathname);
 
-  async function signInWithGoogle() {
-    setSignInGoogleClicked(true);
-    const { data, error } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: {
-        redirectTo,
-        queryParams: {
-          prompt: "consent",
-        },
-      },
-    });
-    router.refresh();
-  }
+  const form = useForm<z.infer<typeof FormSchema>>({
+    resolver: zodResolver(FormSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  });
 
-  async function signInWithGitHub() {
-    setSignInGithubClicked(true);
-    const { data, error } = await supabase.auth.signInWithOAuth({
-      provider: "github",
-      options: {
-        redirectTo,
-        queryParams: {
-          prompt: "consent",
-        },
-      },
-    });
-    router.refresh();
+  async function onSubmit(values: z.infer<typeof FormSchema>) {
+    setIsSubmitting(true);
+    try {
+      if (isSignUp) {
+        const { error } = await supabase.auth.signUp({
+          email: values.email,
+          password: values.password,
+          options: { emailRedirectTo: redirectTo },
+        });
+        if (error) {
+          toast.error(error.message);
+          return;
+        }
+        toast.success(
+          "Check your email to confirm the account if confirmation is enabled.",
+        );
+      } else {
+        const { error } = await supabase.auth.signInWithPassword({
+          email: values.email,
+          password: values.password,
+        });
+        if (error) {
+          toast.error(error.message);
+          return;
+        }
+        setOpen?.(false);
+        router.push("/editor/posts");
+        router.refresh();
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return (
@@ -92,44 +116,66 @@ const LoginSection: React.FC<LoginSectionProps> = ({ setOpen }) => {
           </h3>
         </div>
 
-        {/* Sign in buttons with Social accounts */}
-        <div className="flex flex-col space-y-4 bg-gray-50 px-4 py-8 md:px-16">
+        <div className="bg-gray-50 px-4 py-8 md:px-16">
+          <Form {...form}>
+            <form
+              onSubmit={form.handleSubmit(onSubmit)}
+              className="flex flex-col space-y-4"
+            >
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{sharedLoginConfig.emailLabel}</FormLabel>
+                    <FormControl>
+                      <Input type="email" autoComplete="email" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{sharedLoginConfig.passwordLabel}</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="password"
+                        autoComplete={
+                          isSignUp ? "new-password" : "current-password"
+                        }
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <Button
+                type="submit"
+                disabled={isSubmitting}
+                className="w-full"
+              >
+                {isSignUp
+                  ? sharedLoginConfig.signUpButton
+                  : sharedLoginConfig.signInButton}
+              </Button>
+            </form>
+          </Form>
           <button
-            disabled={signInGoogleClicked}
-            className={`${
-              signInGoogleClicked
-                ? "cursor-not-allowed border-gray-200 bg-gray-100"
-                : "border border-gray-200 bg-white text-black hover:bg-gray-50"
-            } flex h-10 w-full items-center justify-center space-x-3 rounded-md border text-sm shadow-sm transition-all duration-75 focus:outline-none`}
-            onClick={() => signInWithGoogle()}
+            type="button"
+            className="mt-4 w-full text-center text-sm text-gray-600 underline hover:text-gray-900"
+            onClick={() => {
+              setIsSignUp(!isSignUp);
+              form.clearErrors();
+            }}
           >
-            {signInGoogleClicked ? (
-              <LoadingDots color="#808080" />
-            ) : (
-              <>
-                <GoogleIcon className="h-5 w-5" />
-                <p>{sharedLoginConfig.google}</p>
-              </>
-            )}
-          </button>
-
-          <button
-            disabled={signInGithubClicked}
-            className={`${
-              signInGithubClicked
-                ? "cursor-not-allowed border-gray-200 bg-gray-100"
-                : "border border-gray-200 bg-white text-black hover:bg-gray-50"
-            } flex h-10 w-full items-center justify-center space-x-3 rounded-md border text-sm shadow-sm transition-all duration-75 focus:outline-none`}
-            onClick={() => signInWithGitHub()}
-          >
-            {signInGithubClicked ? (
-              <LoadingDots color="#808080" />
-            ) : (
-              <>
-                <GithubIcon className="h-5 w-5" />
-                <p>{sharedLoginConfig.github}</p>
-              </>
-            )}
+            {isSignUp
+              ? sharedLoginConfig.switchToSignIn
+              : sharedLoginConfig.switchToSignUp}
           </button>
         </div>
       </div>

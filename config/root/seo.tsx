@@ -1,11 +1,10 @@
 import { SeoType } from "types";
 
 export const seoData: SeoType = {
-  title: "Multi-user, full-stack blogging application",
-  subTitle:
-    "Multi-user, full-stack blogging app built with Next.js and Supabase",
-  absoluteTitle: "Next.js | Blog app",
-  ogTitle: "Next.js | Supabase | Blog app",
+  title: "[SITE_NAME]",
+  subTitle: "[SITE_NAME]",
+  absoluteTitle: "Next.js | [SITE_NAME]",
+  ogTitle: "Next.js | Supabase | [SITE_NAME]",
   author: {
     name: "Tim",
     twitterUrl: "https://twitter.com/timtbdev",

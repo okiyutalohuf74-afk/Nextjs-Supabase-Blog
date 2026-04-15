@@ -1,6 +1,5 @@
 import {
   FacebookIcon,
-  GithubIcon,
   InstagramIcon,
   TwitterIcon,
   YoutubeIcon,
@@ -20,14 +19,6 @@ const mainFooterConfig: FooterType = {
       slug: "/about",
     },
     {
-      title: "Docs",
-      slug: "/docs",
-    },
-    {
-      title: "Changelogs",
-      slug: "/changelogs",
-    },
-    {
       title: "Contact",
       slug: "/contact",
     },
@@ -36,27 +27,22 @@ const mainFooterConfig: FooterType = {
   socials: [
     {
       name: "Facebook",
-      url: "https://facebook.com",
+      url: "#",
       icon: FacebookIcon,
     },
     {
-      name: "Github",
-      url: "https://github.com/timtbdev",
-      icon: GithubIcon,
-    },
-    {
       name: "Instagram",
-      url: "https://instagram.com",
+      url: "#",
       icon: InstagramIcon,
     },
     {
       name: "Twitter",
-      url: "https://twitter.com/timtbdev",
+      url: "#",
       icon: TwitterIcon,
     },
     {
       name: "Youtube",
-      url: "https://youtube.com",
+      url: "#",
       icon: YoutubeIcon,
     },
   ],
@@ -70,7 +56,7 @@ const mainFooterConfig: FooterType = {
       slug: "/policy",
     },
   ],
-  copyright: "© 2023 Fullstack Blogging App. All rights reserved.",
+  copyright: "© 2026 [SITE_NAME]. All rights reserved.",
 };
 
 export default mainFooterConfig;
