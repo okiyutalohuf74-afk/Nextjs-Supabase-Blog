@@ -31,10 +31,15 @@ const LoginMenu = () => {
 
   useEffect(() => {
     async function fetchAvatar() {
-      const { data, error } = await supabase
+      const userId = session?.user?.id;
+      if (!userId) {
+        setAvatarUrl("");
+        return;
+      }
+      const { data } = await supabase
         .from("profiles")
         .select("*")
-        .match({ id: session?.user.id })
+        .match({ id: userId })
         .single<Profile>();
       if (data) {
         setAvatarUrl(data.avatar_url ? data.avatar_url : "");

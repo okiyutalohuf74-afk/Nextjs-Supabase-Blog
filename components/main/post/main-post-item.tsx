@@ -12,7 +12,13 @@ import readingTime from "reading-time";
 
 export const dynamic = "force-dynamic";
 
-async function getPublicImageUrl(postId: string, fileName: string) {
+async function getPublicImageUrl(
+  postId: string | null | undefined,
+  fileName: string | null | undefined,
+) {
+  if (!postId || !fileName) {
+    return "/images/not-found.jpg";
+  }
   const cookieStore = cookies();
   const supabase = createClient(cookieStore);
   const bucketName =
@@ -26,7 +32,10 @@ async function getPublicImageUrl(postId: string, fileName: string) {
   return "/images/not-found.jpg";
 }
 
-async function getComments(postId: string) {
+async function getComments(postId: string | null | undefined) {
+  if (!postId) {
+    return [];
+  }
   const cookieStore = cookies();
   const supabase = createClient(cookieStore);
   const { data: comments, error } = await supabase
@@ -48,7 +57,7 @@ interface MainPostItemProps {
 
 const MainPostItem: React.FC<MainPostItemProps> = async ({ post }) => {
   const readTime = readingTime(post.content ? post.content : "");
-  const comments = await getComments(post.id ? post.id : "");
+  const comments = await getComments(post.id);
 
   return (
     <>
