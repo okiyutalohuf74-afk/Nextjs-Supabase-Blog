@@ -17,7 +17,7 @@ const Email: FC<EmailProps> = ({ name, email, message }) => {
                         <Heading className="mx-0 my-[30px] p-0 text-center text-[24px] font-normal text-black">
                             You got a message!
                         </Heading>
-                        <Text className="text-[14px] leading-[24px] text-black">Hello Tim,</Text>
+                        <Text className="text-[14px] leading-[24px] text-black">Hello,</Text>
                         <Text className="text-[14px] leading-[24px] text-black">
                             You got an email from <strong>{name}</strong>. Their email is {email}. The message: <br />
                             {message}

@@ -2,7 +2,8 @@ import { TermsPageType } from "@/types";
 
 const mainPageTermsConfig: TermsPageType = {
   title: "Terms of Service",
-  description: "By using ub.cafe, you agree to the following terms of service.",
+  description:
+    "By using royalreelsdirect.com, you agree to the following terms of service.",
   paragraphs: [
     {
       description:

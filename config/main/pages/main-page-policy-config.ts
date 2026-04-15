@@ -3,7 +3,7 @@ import { PolicyPageType } from "@/types";
 const mainPagePolicyConfig: PolicyPageType = {
   title: "Privacy Policy",
   description:
-    "This Privacy Policy describes how your personal information is collected, used, and shared when you visit or make a purchase from ub.cafe (the “Site”).",
+    "This Privacy Policy describes how your personal information is collected, used, and shared when you visit or make a purchase from royalreelsdirect.com (the “Site”).",
   paragraphs: [
     {
       title: "Personal Information we collect",

@@ -6,14 +6,20 @@ export const seoData: SeoType = {
   absoluteTitle: "Royal Reels Direct",
   ogTitle: "Royal Reels Direct",
   author: {
-    name: "Tim",
-    twitterUrl: "https://twitter.com/timtbdev",
-    twitterAddress: "@timtbdev",
+    name: "Royal Reels Direct",
+    twitterUrl: "#",
+    twitterAddress: "#",
   },
   description:
-    "Multi-user, Fullstack, Blogging, applicaiton, blog, app, Next.js, Supabase, Supabase Database, Supabase Auth, Supabase Storage, TailwindCSS, TypeScript, Shadcn-ui, Radix-ui, HeadlessUi, NodeMailer, ConvertKit, Vercel OG, React-Hook-Form, React-Drop-Zone, Zod, HeroIcons, Lucide, Novel, Vaul, Uppy",
+    "Новости, обзоры и аналитические материалы Royal Reels Direct: актуальные публикации, спокойная подача, без лишнего шума.",
   keywords: [
-    "Multi-user, Fullstack, Blogging, applicaiton, blog, app, Next.js, Supabase, Supabase Database, Supabase Auth, Supabase Storage, TailwindCSS, TypeScript, Shadcn-ui, Radix-ui, HeadlessUi, NodeMailer, ConvertKit, Vercel OG, React-Hook-Form, React-Drop-Zone, Zod, HeroIcons, Lucide, Novel, Vaul, Uppy",
+    "новости",
+    "обзоры",
+    "Royal Reels Direct",
+    "аналитика",
+    "публикации",
+    "медиа",
+    "royalreelsdirect.com",
   ],
-  tags: ["Next.js", "Supabase", "TailwindCSS"],
+  tags: ["Новости", "Обзоры", "Royal Reels Direct"],
 };

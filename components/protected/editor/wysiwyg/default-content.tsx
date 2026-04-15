@@ -4,33 +4,37 @@ export const defaultEditorContent = {
     {
       type: "heading",
       attrs: { level: 2 },
-      content: [{ type: "text", text: "Introducing Next.js - Blog app" }],
+      content: [{ type: "text", text: "Royal Reels Direct" }],
     },
     {
       type: "paragraph",
       content: [
         {
           type: "text",
-          text: " This is an full-stack blogging app. Built with Next.js 13 and Supabase",
+          text: "Здесь будет текст материала: новости, обзоры или аналитика. Замените этот абзац на свой контент.",
         },
       ],
     },
-
     {
       type: "heading",
       attrs: { level: 3 },
-      content: [{ type: "text", text: "Features" }],
+      content: [{ type: "text", text: "Структура" }],
     },
     {
-      type: "orderedList",
-      attrs: { tight: true, start: 1 },
+      type: "bulletList",
+      attrs: { tight: true },
       content: [
         {
           type: "listItem",
           content: [
             {
               type: "paragraph",
-              content: [{ type: "text", text: "Bubble menu and slash menu" }],
+              content: [
+                {
+                  type: "text",
+                  text: "Краткий лид и основная мысль.",
+                },
+              ],
             },
           ],
         },
@@ -42,23 +46,27 @@ export const defaultEditorContent = {
               content: [
                 {
                   type: "text",
-                  text: "Image and Link insertion via url ",
+                  text: "Факты, контекст и выводы по теме.",
+                },
+              ],
+            },
+          ],
+        },
+        {
+          type: "listItem",
+          content: [
+            {
+              type: "paragraph",
+              content: [
+                {
+                  type: "text",
+                  text: "При необходимости — иллюстрации и ссылки на источники.",
                 },
               ],
             },
           ],
         },
       ],
-    },
-    {
-      type: "image",
-      attrs: {
-        src: "https://iskzuogcmkzumadqjnbv.supabase.co/storage/v1/object/public/posts/banner/banners.png",
-        alt: "banners.png",
-        title: "banners.png",
-        width: null,
-        height: null,
-      },
     },
   ],
 };
