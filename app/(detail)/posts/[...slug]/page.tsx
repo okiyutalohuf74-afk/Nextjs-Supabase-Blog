@@ -183,7 +183,11 @@ export default async function PostPage({ params }: PostPageProps) {
                   image={post.image as string}
                   authorName={post.profiles.full_name as string}
                   authorImage={post.profiles.avatar_url as string}
-                  date={format(parseISO(post.updated_at!), "MMMM dd, yyyy")}
+                  date={
+                    post.updated_at
+                      ? format(parseISO(post.updated_at), "MMMM dd, yyyy")
+                      : format(parseISO(post.created_at!), "MMMM dd, yyyy")
+                  }
                   category={post.categories?.title as string}
                   readTime={readTime as ReadTimeResults}
                 />
